@@ -1,0 +1,34 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get Date
+      id: get-date
+      run: |
+        echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+    # Используем проверенный готовый экшен для сборки через Buildozer
+    - name: Buildozer Action
+      uses: ArtemSsh/buildozer-action@v1
+      with:
+        buildozer_version: stable
+        command: buildozer android debug
+        repository_root: .
+
+    # Загружаем готовый APK в артефакты, чтобы его можно было скачать
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: flashcards-apk-${{ steps: get-date.outputs.date }}
+        path: bin/*.apk
