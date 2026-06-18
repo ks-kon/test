@@ -20,7 +20,7 @@ jobs:
 
     # Используем проверенный готовый экшен для сборки через Buildozer
     - name: Buildozer Action
-      uses: ArtemSsh/buildozer-action@v1
+      uses: ArtemSBulgakov/buildozer-action@v1
       with:
         buildozer_version: stable
         command: buildozer android debug
