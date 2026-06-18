@@ -1,0 +1,282 @@
+<Card>:
+    orientation: 'vertical'
+    padding: 20
+    spacing: 10
+    canvas.before:
+        Color:
+            id: rect_color
+            rgba: self.bg_color
+        RoundedRectangle:
+            id: bg_rect
+            pos: self.pos
+            size: self.size
+            radius: [10]
+    Label:
+        color: root.get_article_color(root.card_text)
+        id: label_card_text
+        text: root.card_text
+
+
+<CardScreen>:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        padding: 10
+        spacing: 10
+        orientation: 'vertical'
+
+        BoxLayout:
+            size_hint: 1, None
+            height: '55dp'
+            Button:
+                size_hint_y: None
+                height: '50dp'
+                id: btn_add_card
+                text: 'Добавить слово'
+                text_size: self.width-dp(40), None
+                halign: 'center'
+                on_release: app.sm.current = 'add'
+            Button:
+                size_hint_y: None
+                height: '50dp'
+                text_size: self.width, None
+                halign: 'center'
+                text: 'Список слов'
+                on_release: app.sm.current = 'list'
+            Button:
+                size_hint_y: None
+                height: '50dp'
+                text: 'Сохранить словарь'
+                text_size: self.width-dp(40), None
+                halign: 'center'
+                on_release: app.data_manager.save_json_to_downloads()
+
+        BoxLayout:
+            id: cards_container
+            size_hint_y: 0.7
+            orientation: 'vertical'
+            height:300
+
+        Label:
+            id: label_counter
+            text: ""
+            size_hint_y: None
+            height: '50dp'
+            color: 0, 0, 0, 1
+
+        Button:
+            size_hint_y: None
+            height: '50dp'
+            text: 'Начать сначала'
+            on_release: root.restart_cards()
+
+        Button:
+            size_hint_y: None
+            height: '50dp'
+            text: 'Выйти'
+            on_release: app.stop()
+
+
+<AddScreen>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: 20
+        padding: 10
+        pos_hint: {'top': 1}
+
+        Label:
+            text: 'Редактирование карты'
+            bold: True
+            color: 0.12, 0.12, 0.12, 1
+            size_hint_y: None
+            height: '60dp'
+            halign: 'center'
+            valign: 'middle'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '52dp'
+            spacing: 15
+
+            Label:
+                text: 'Слово:'
+                font_size: '16sp'
+                bold: True
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: None
+                width: '80dp'         # Фиксированная ширина подписи, чтобы поля выровнялись
+                halign: 'left'
+                text_size: self.size
+                valign: 'middle'
+
+            TextInput:
+                id: front_input
+                hint_text: 'front'
+                multiline: False
+                padding: [15, 15, 15, 15]
+                background_normal: ''
+                background_color: 0.95, 0.95, 0.97, 1
+
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '52dp'
+            spacing: 15
+
+            Label:
+                text: 'Перевод:'
+                bold: True
+                color: 0.2, 0.2, 0.2, 1
+                size_hint_x: None
+                width: '80dp'         # Такая же ширина, для идеального выравнивания по сетке
+                halign: 'left'
+                text_size: self.size
+                valign: 'middle'
+
+            TextInput:
+                id: back_input
+                hint_text: 'back'
+                multiline: False
+                background_normal: ''
+                background_color: 0.95, 0.95, 0.97, 1
+                padding: [15, 15, 15, 15]
+
+        # Разделитель-пустота
+        Widget:
+            size_hint_y: None
+            height: '20dp'
+
+        # Кнопка Сохранить
+        Button:
+            text: 'Сохранить карточку'
+            size_hint_y: None
+            height: '50dp'
+            background_normal: ''
+            background_color: 0.3, 0.7, 0.4, 1
+            on_release: root.save_text_input(front_input.text, back_input.text)
+
+        # Кнопка Выход
+        Button:
+            text: 'Выйти'
+            size_hint_y: None
+            height: '50dp'
+            on_press: app.sm.current = 'cards'
+
+
+
+# Описание строки таблицы
+<CardRow>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '40dp'
+    padding: [10, 5]
+    spacing: 10
+
+    # Фон для строки, чтобы отделять их друг от друга
+    canvas.before:
+        Color:
+            rgba: 0.75, 0.75, 0.75, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    Label:
+        text: root.front
+        halign: 'left'
+        text_size: self.size
+        valign: 'middle'
+        color: 0,0,0,1
+
+    Label:
+        text: root.back
+        halign: 'left'
+        text_size: self.size
+        valign: 'middle'
+        color: 0,0,0,1
+
+    Button:
+        text: "Edit"
+        size_hint_x: None
+        width: '60dp'
+        background_color: 0.4, 0.8, 1, 1
+        on_release: root.cr_edit_row(root.card_index, root.front, root.back)
+
+    Button:
+        text: "Delete"
+        size_hint_x: None
+        width: '60dp'
+        background_color: 1, 0.5, 0.5, 1
+        on_release: root.cr_delete_row(root.card_index)
+
+
+# Экран со списком
+<ListScreen>:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    rv: recycle_view_id
+
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 20
+        spacing: 10
+
+        # Шапка таблицы
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '30dp'
+            padding: [10, 0]
+            spacing: 10
+            Label:
+                text: "Список слов"
+                color: 0,0,0,1
+                halign: 'center'
+            # Пустые места над кнопками, чтобы выровнять шапку
+            Widget:
+                size_hint_x: None
+                width: '60dp'
+            Widget:
+                size_hint_x: None
+                width: '60dp'
+
+        # Сама таблица (умный список)
+        RecycleView:
+            id: recycle_view_id
+            viewclass: 'CardRow' # Какой класс использовать для отображения строк
+            RecycleBoxLayout:
+                default_size: None, dp(45)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                orientation: 'vertical'
+                spacing: 5
+
+        Button:
+            text: "Добавить новую карту"
+            size_hint_y: None
+            height: '50dp'
+            on_release: app.sm.current = 'add'
+
+        Button:
+            text: 'Выйти'
+            size_hint_y: None
+            height: '50dp'
+            on_press: app.sm.current = 'cards'
